@@ -9,6 +9,8 @@ const wrapAsync = require("./utils/wrapAsync.js")
 const ExpressError = require("./utils/ExpressError.js")
 const { listingSchema } = require("./schema.js");
 const { el } = require("@faker-js/faker");
+const Review = require("./models/review.js")
+
 
 const mongo_url = "mongodb://127.0.0.1:27017/WanderLust";
 
@@ -95,6 +97,22 @@ app.delete("/listings/:id", wrapAsync(async(req, res) => {
 app.listen(8080, ()=> {
     console.log("App is listening to port 8080")
 })
+
+//Reviews
+//Post route
+
+app.post("/listings/:id/reviews", async(req, res) => {
+    let listing = await Listing.findById(req.params.id)
+    let newReview = new Review(req.body.review)
+
+    listing.reviews.push(newReview)
+    
+    await newReview.save()
+    await listing.save()
+
+    res.redirect(`/listings/${listing._id}`)
+})
+
 
 // app.get("/testing", async (req, res) => {
 //     let sampleListing = new Listing({
